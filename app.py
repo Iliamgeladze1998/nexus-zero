@@ -4,7 +4,8 @@ from datetime import datetime
 import urllib.parse
 
 # --- CONFIGURATION ---
-GROQ_API_KEY = "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"
+# ვიყენებთ Streamlit Secrets-ს უსაფრთხოებისთვის
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
@@ -51,7 +52,6 @@ with st.sidebar:
     st.markdown("### ⚙️ STRATEGIC PARAMETERS")
     social_type = st.select_slider("Energy Profile:", options=["Introvert", "Balanced", "Extrovert"])
     
-    # გაფართოებული და დახვეწილი პროფესიების სია
     asset_list = [
         "Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment",
         "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR",
@@ -75,20 +75,22 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
     if mission:
         with st.spinner("ANALYZING SOCIAL VECTORS..."):
             context = f"User: {social_type}, Skills: {skills}."
+            # დავამატეთ ინსტრუქცია ენის შესახებ
             prompt = (
                 f"User context: {context}. Mission: {mission}. "
                 "Provide an elite Social Blueprint for Tbilisi. "
                 "Structure: 1. Venue Name (Real location). 2. Exact Spot (Specific area). "
                 "3. Persona Identification. 4. Professional Icebreaker. "
                 "5. Strategic Action Plan. 6. Logic of Probability. "
-                "Tone: Professional, tactical. Start with 'Venue Name: [Name]'."
+                "Tone: Professional, tactical. Start with 'Venue Name: [Name]'. "
+                "IMPORTANT: You MUST respond strictly in the SAME LANGUAGE as the Mission text provided by the user."
             )
             
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
             data = {
                 "model": "llama-3.3-70b-versatile",
                 "messages": [
-                    {"role": "system", "content": "You are a senior social strategist. Provide high-level tactical advice for Tbilisi."},
+                    {"role": "system", "content": "You are a senior social strategist. You are multilingual and always respond in the language used by the user."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.4
@@ -99,7 +101,9 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                 result = response.json()["choices"][0]["message"]["content"]
                 
                 try:
-                    venue_name = [l for l in result.split('\n') if 'Venue Name:' in l][0].split(':')[1].strip()
+                    # ვცდილობთ ამოვიცნოთ ლოკაცია ნებისმიერ ენაზე
+                    venue_line = [l for l in result.split('\n') if ':' in l][0]
+                    venue_name = venue_line.split(':')[1].strip()
                 except:
                     venue_name = "Tbilisi"
                 
@@ -108,7 +112,7 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                 
                 m1, m2 = st.columns(2)
                 with m1:
-                    st.link_button("📍 DEPLOY TO GOOGLE MAPS", f"https://www.google.com/maps/search/{urllib.parse.quote(venue_name + ' Tbilisi')}")
+                    st.link_button("📍 DEPLOY TO GOOGLE MAPS", f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(venue_name + ' Tbilisi')}")
                 with m2:
                     st.download_button("💾 DOWNLOAD DOSSIER", result, file_name="nexus_mission.txt")
                     
@@ -124,4 +128,4 @@ with f1:
     st.markdown("**Architect:** Ilia Mgeladze")
     st.markdown(f"**Inquiries:** [Mgeladzeilia39@gmail.com](mailto:Mgeladzeilia39@gmail.com)")
 with f2:
-    st.markdown("<div style='text-align: right; color: #555;'>V2.3 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: right; color: #555;'>V2.4 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
