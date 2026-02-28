@@ -12,7 +12,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: აბსოლუტურად ხელუხლებელი დიზაინი + საბოლოო "Press Enter" ფიქსი
+# UI: დიზაინი ხელუხლებელია + Press Enter-ის საბოლოო ბლოკირება
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,27 +22,15 @@ st.markdown("""
             linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px) !important;
         background-size: 30px 30px !important;
     }
-
-    /* სამუდამოდ აქრობს "Press Enter to apply" ყველა ვარიაციას მობილურზე */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
-    .st-emotion-cache-1pxm8yv, 
-    .st-emotion-cache-1p78y8e, 
-    .st-emotion-cache-6q9sum,
+    .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
     section[data-testid="stTextInput"] small {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
-        position: absolute !important;
     }
-
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
     p, label { color: #000000 !important; font-weight: 700 !important; }
-
-    @media (max-width: 768px) {
-        .main .block-container { padding: 1rem !important; }
-        h1 { font-size: 1.6rem !important; }
-    }
-
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -59,12 +47,23 @@ st.markdown("""
 tbilisi_tz = pytz.timezone('Asia/Tbilisi')
 timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
 
-# --- HEADER ---
+# --- HEADER & GUIDE (ახალი ბლოკი) ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
+
+# მოკლე აღწერა, რომელიც მომხმარებელს გზას უჩვენებს
+with st.expander("📖 HOW IT WORKS / რისთვისაა ეს?"):
+    st.markdown("""
+    **Nexus Zero** არის თბილისზე მორგებული სოციალური სტრატეგი.
+    1. **Profile:** მონიშნე შენი ენერგიის დონე.
+    2. **Assets:** აირჩიე შენი ძლიერი მხარეები.
+    3. **Mission:** დაწერე რა გინდა (მაგ: ბიზნეს პარტნიორის პოვნა).
+    4. **Result:** მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა.
+    """)
+
 st.caption(f"STATUS: ONLINE | TIME: {timestamp}")
 st.write("---")
 
-# --- INPUTS ---
+# --- INPUTS (იდენტურია, როგორც სქრინებზე გქონდა) ---
 col1, col2 = st.columns(2)
 with col1:
     social_type = st.select_slider("Profile:", options=["Introvert", "Balanced", "Extrovert"])
@@ -77,16 +76,9 @@ mission = st.text_input("MISSION:", placeholder="e.g. I want to find a business 
 if st.button("EXECUTE ALIGNMENT"):
     if mission:
         with st.spinner("SCANNING GRID..."):
-            prompt = f"""
-            Mission: {mission}. Profile: {social_type}. Assets: {skills}. 
-            Provide a tactical plan for Tbilisi: 
-            1. EXACT LOCATION (Specific venue name). 
-            2. EXACT TIME to go. 
-            3. EXACT ACTION (Who to talk to, what to say). 
-            At the end, write ONLY the place name like this: 'FINAL_DESTINATION: Venue Name'
-            """
+            prompt = f"Mission: {mission}. Profile: {social_type}. Assets: {skills}. Tactical Tbilisi strategy. End with 'FINAL_DESTINATION: Venue Name'."
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-            data = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": "You are a tactical social engineer. Be precise."}, {"role": "user", "content": prompt}], "temperature": 0.4}
+            data = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": "You are a tactical advisor. Be precise."}, {"role": "user", "content": prompt}], "temperature": 0.4}
             
             try:
                 response = requests.post(GROQ_URL, headers=headers, json=data)
@@ -98,7 +90,6 @@ if st.button("EXECUTE ALIGNMENT"):
                     maps_url = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_name + ' Tbilisi')}"
                     st.link_button(f"📍 NAVIGATE TO {loc_name.upper()}", maps_url)
 
-                # PDF Fix (Binary bytes)
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
