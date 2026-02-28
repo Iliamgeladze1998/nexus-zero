@@ -11,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: სუფთა დიზაინი + ტექსტის გარანტირებული ხილვადობა
+# UI: სუფთა დიზაინი
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,15 +22,6 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
     
-    /* გარანტირებული შავი ტექსტი Expander-ში */
-    [data-testid="stExpander"] div[role="button"] p, 
-    [data-testid="stExpander"] .stMarkdown p {
-        color: #000000 !important;
-        font-weight: 700 !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
-
     /* Press Enter Fix */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
@@ -56,12 +47,11 @@ st.markdown("""
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
 with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
-    st.markdown("""
-    1. **Profile:** მიუთითე შენი სოციალური ენერგიის დონე.
-    2. **Assets:** მონიშნე შენი ძლიერი მხარეები და უნარები.
-    3. **Mission:** ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).
-    4. **Execute:** მიიღე სტრატეგიული გეგმა, ლოკაცია და დრო.
-    """)
+    # ვიყენებთ st.caption-ს, რადგან ეს მობილურზე 100% ჩანს
+    st.caption("1. Profile: მიუთითე შენი სოციალური ენერგიის დონე.")
+    st.caption("2. Assets: მონიშნე შენი ძლიერი მხარეები და უნარები.")
+    st.caption("3. Mission: ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).")
+    st.caption("4. Execute: მიიღე სტრატეგიული გეგმა, ლოკაცია და დრო.")
 
 tbilisi_tz = pytz.timezone('Asia/Tbilisi')
 timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
