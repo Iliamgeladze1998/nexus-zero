@@ -11,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: სუფთა დიზაინი + ტექსტის გარანტირებული ხილვადობა
+# UI: Force Visibility for Expanders
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,16 +22,12 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
     
-    /* გარანტირებული შავი ტექსტი Expander-ში (რომ მობილურზე არ გაქრეს) */
-    [data-testid="stExpander"] div[role="button"] p, 
-    [data-testid="stExpander"] .stMarkdown p {
+    /* აიძულებს ექსპანდერის ტექსტს იყოს შავი ნებისმიერ ეკრანზე */
+    .stExpander div[data-testid="stMarkdownContainer"] p {
         color: #000000 !important;
-        font-weight: 700 !important;
-        opacity: 1 !important;
-        visibility: visible !important;
+        font-weight: 600 !important;
     }
 
-    /* Press Enter Fix */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
     section[data-testid="stTextInput"] small {
@@ -39,8 +35,7 @@ st.markdown("""
     }
 
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
-    p, label { color: #000000 !important; font-weight: 700 !important; }
-
+    
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -55,14 +50,16 @@ st.markdown("""
 # --- HEADER & GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-# ჩამოსაშლელი ინსტრუქცია - ახლა უკვე გარანტირებულად გამოჩნდება
 with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
+    # ვიყენებთ HTML-ს ფერის დასაზღვევად, რომ მობილურმა ვერ "გააქროს"
     st.markdown("""
-    1. **Profile:** მიუთითე შენი სოციალური ენერგიის დონე.
-    2. **Assets:** მონიშნე შენი ძლიერი მხარეები და უნარები.
-    3. **Mission:** ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).
-    4. **Execute:** მიიღე სტრატეგიული გეგმა, ლოკაცია და დრო.
-    """)
+    <div style="color: #000000 !important; font-size: 0.95rem;">
+    1. <b>Profile:</b> მიუთითე შენი სოციალური ენერგიის დონე.<br>
+    2. <b>Assets:</b> მონიშნე შენი ძლიერი მხარეები და უნარები.<br>
+    3. <b>Mission:</b> ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).<br>
+    4. <b>Result:</b> მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა.
+    </div>
+    """, unsafe_allow_html=True)
 
 tbilisi_tz = pytz.timezone('Asia/Tbilisi')
 timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
@@ -106,9 +103,8 @@ if st.button("EXECUTE ALIGNMENT"):
 
 # --- FOOTER ---
 st.write("---")
-# ქვედა ჩამოსაშლელი (Legal)
 with st.expander("⚖️ LEGAL & PRIVACY"):
-    st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
+    st.markdown('<p style="color: #000000 !important;">Nexus Zero Protocol. Developed by Ilia Mgeladze.</p>', unsafe_allow_html=True)
 
 st.markdown(f"**Architect:** Ilia Mgeladze")
 st.markdown(f"**Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
