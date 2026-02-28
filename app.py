@@ -11,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: სუფთა დიზაინი ზედმეტი ტექსტების გარეშე
+# UI: სუფთა დიზაინი + ტექსტის გარანტირებული ხილვადობა
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,6 +22,15 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
     
+    /* გარანტირებული შავი ტექსტი Expander-ში (რომ მობილურზე არ გაქრეს) */
+    [data-testid="stExpander"] div[role="button"] p, 
+    [data-testid="stExpander"] .stMarkdown p {
+        color: #000000 !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
     /* Press Enter Fix */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
@@ -46,7 +55,7 @@ st.markdown("""
 # --- HEADER & GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-# ჩამოსაშლელი ინსტრუქცია 4 პუნქტად
+# ჩამოსაშლელი ინსტრუქცია - ახლა უკვე გარანტირებულად გამოჩნდება
 with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
     st.markdown("""
     1. **Profile:** მიუთითე შენი სოციალური ენერგიის დონე.
@@ -97,7 +106,7 @@ if st.button("EXECUTE ALIGNMENT"):
 
 # --- FOOTER ---
 st.write("---")
-# მხოლოდ ჩამოსაშლელი Legal, ზედმეტი ტექსტის გარეშე
+# ქვედა ჩამოსაშლელი (Legal)
 with st.expander("⚖️ LEGAL & PRIVACY"):
     st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
 
