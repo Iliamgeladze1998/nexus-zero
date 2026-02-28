@@ -11,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: Adaptive Display CSS
+# UI: Adaptive Styles & High Visibility Footer
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,15 +22,22 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
 
-    /* მობილურზე (ეკრანი < 768px) ვმალავთ Expander-ს და ვაჩვენებთ ტექსტს */
+    /* Adaptive Guide Visibility */
     @media (max-width: 768px) {
         .desktop-guide { display: none !important; }
         .mobile-guide { display: block !important; }
+        .footer-text { font-size: 0.85rem !important; color: #000000 !important; font-weight: 700 !important; }
     }
-    /* ლეპტოპზე პირიქით */
     @media (min-width: 769px) {
         .desktop-guide { display: block !important; }
         .mobile-guide { display: none !important; }
+    }
+
+    /* Press Enter Fix */
+    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
+    .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
+    section[data-testid="stTextInput"] small {
+        display: none !important;
     }
 
     .guide-box {
@@ -43,13 +50,9 @@ st.markdown("""
         border-left: 4px solid #2563EB;
     }
 
-    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
-    .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
-    section[data-testid="stTextInput"] small {
-        display: none !important;
-    }
-
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
+    p, label, .stMarkdown { color: #000000 !important; font-weight: 700 !important; }
+
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -61,17 +64,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER ---
+# --- HEADER & ADAPTIVE GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-guide_html = """
-<b>როგორ მუშაობს:</b> მონიშნე პროფილი, აირჩიე Assets, დაწერე მისია და მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა თბილისში.
-"""
-
-# მობილური ვერსია (CSS აკონტროლებს გამოჩენას)
+guide_html = "<b>როგორ მუშაობს:</b> მონიშნე პროფილი, Assets, დაწერე მისია და მიიღე სამოქმედო გეგმა თბილისში."
 st.markdown(f'<div class="mobile-guide"><div class="guide-box">{guide_html}</div></div>', unsafe_allow_html=True)
-
-# ლეპტოპის ვერსია (CSS აკონტროლებს გამოჩენას)
 st.markdown('<div class="desktop-guide">', unsafe_allow_html=True)
 with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
     st.markdown(guide_html, unsafe_allow_html=True)
@@ -114,13 +111,20 @@ if st.button("EXECUTE ALIGNMENT"):
                 pdf.set_font("Arial", size=12)
                 pdf.multi_cell(0, 10, txt=result.encode('latin-1', 'replace').decode('latin-1'))
                 st.download_button("📥 DOWNLOAD PDF DOSSIER", data=bytes(pdf.output(dest='S')), file_name="nexus_strategy.pdf")
-
             except Exception as e:
                 st.error(f"Grid Error: {e}")
 
-# --- FOOTER ---
+# --- FOOTER (გამოსწორებული ხილვადობა) ---
 st.write("---")
+# მობილურზე პირდაპირ ვაჩვენებთ, ლეპტოპზე ექსპანდერში
+st.markdown('<div class="mobile-guide">', unsafe_allow_html=True)
+st.markdown("**⚖️ LEGAL:** Nexus Zero Protocol. Developed by Ilia Mgeladze.")
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="desktop-guide">', unsafe_allow_html=True)
 with st.expander("⚖️ LEGAL & PRIVACY"):
     st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
+st.markdown('</div>', unsafe_allow_html=True)
+
 st.markdown(f"**Architect:** Ilia Mgeladze")
 st.markdown(f"**Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
