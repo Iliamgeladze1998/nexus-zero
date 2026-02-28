@@ -1,8 +1,8 @@
 import streamlit as st
 import requests
 from datetime import datetime
-import urllib.parse
 import pytz
+from fpdf import FPDF
 
 # --- CONFIGURATION ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -10,7 +10,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: Adaptive Grid + No "Press Enter" + Visibility Fix
+# UI (დიზაინი უცვლელია, როგორც გინდოდა)
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -20,49 +20,32 @@ st.markdown("""
             linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px) !important;
         background-size: 30px 30px !important;
     }
-    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p {
-        display: none !important;
-    }
-    .st-emotion-cache-1pxm8yv { display: none !important; }
+    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p { display: none !important; }
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
-    p, label { color: #000000 !important; font-weight: 700 !important; }
-    @media (max-width: 768px) {
-        .main .block-container { padding: 1rem !important; }
-        h1 { font-size: 1.6rem !important; }
-    }
-    .stButton>button {
-        width: 100% !important;
-        background-color: #2563EB !important;
-        color: white !important;
-        border-radius: 12px;
-        font-weight: bold;
-        height: 3.5em;
-        border: none !important;
-    }
+    .stButton>button { width: 100% !important; background-color: #2563EB !important; color: white !important; border-radius: 12px; font-weight: bold; height: 3.5em; border: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIME ---
-tbilisi_tz = pytz.timezone('Asia/Tbilisi')
-timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
+# --- PDF GENERATOR FUNCTION ---
+def create_pdf(text):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt=text.encode('latin-1', 'replace').decode('latin-1'))
+    return pdf.output(dest='S')
 
 # --- HEADER ---
+tbilisi_tz = pytz.timezone('Asia/Tbilisi')
+timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 st.caption(f"STATUS: ONLINE | TIME: {timestamp}")
-st.write("---")
 
 # --- INPUTS ---
 col1, col2 = st.columns(2)
 with col1:
     social_type = st.select_slider("Profile:", options=["Introvert", "Balanced", "Extrovert"])
 with col2:
-    # გაზრდილი და მრავალფეროვანი Assets სია
-    asset_options = [
-        "Tech/AI", "Crypto/Web3", "Business/Sales", "Finance/Trading", 
-        "Marketing/PR", "Real Estate", "Creative/Art", "Education", 
-        "Legal/Gov", "Health/Sport", "E-commerce", "Charisma", "Capital",
-        "Event Planning", "Psychology", "Design/UI-UX"
-    ]
+    asset_options = ["Tech/AI", "Crypto/Web3", "Business", "Finance", "Marketing", "Real Estate", "Creative/Art", "Charisma", "Capital"]
     skills = st.multiselect("Assets:", asset_options)
 
 mission = st.text_input("MISSION:", placeholder="e.g. I want to find a business partner...")
@@ -70,19 +53,32 @@ mission = st.text_input("MISSION:", placeholder="e.g. I want to find a business 
 if st.button("EXECUTE ALIGNMENT"):
     if mission:
         with st.spinner("SCANNING GRID..."):
-            prompt = f"Mission: {mission}. Profile: {social_type}. Assets: {skills}. Tbilisi strategy."
+            # ვავალებთ AI-ს კონკრეტულ ლოკაციებს და რუკას
+            prompt = f"""
+            Mission: {mission}. Profile: {social_type}. Assets: {skills}. 
+            Provide a tactical strategy for Tbilisi. 
+            MUST INCLUDE: At least 2 specific physical locations in Tbilisi with Google Maps search links.
+            """
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-            data = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "temperature": 0.3}
+            data = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": "You are a Tbilisi-based strategic advisor. Be specific about locations."}, {"role": "user", "content": prompt}], "temperature": 0.3}
+            
             try:
                 response = requests.post(GROQ_URL, headers=headers, json=data)
-                st.info(response.json()["choices"][0]["message"]["content"])
+                result = response.json()["choices"][0]["message"]["content"]
+                st.session_state['result'] = result
+                st.info(result)
             except:
                 st.error("Grid Error.")
 
-# --- FOOTER ---
-st.write("---")
-with st.expander("⚖️ LEGAL & PRIVACY"):
-    st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
+# --- PDF DOWNLOAD SECTION ---
+if 'result' in st.session_state:
+    pdf_data = create_pdf(st.session_state['result'])
+    st.download_button(
+        label="📥 Download Strategy as PDF",
+        data=pdf_data,
+        file_name=f"Nexus_Strategy_{timestamp}.pdf",
+        mime="application/pdf"
+    )
 
-st.markdown(f"**Architect:** Ilia Mgeladze")
-st.markdown(f"**Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
+st.write("---")
+st.markdown(f"**Architect:** Ilia Mgeladze | **Inquiries:** mgeladzeilia39@gmail.com")
