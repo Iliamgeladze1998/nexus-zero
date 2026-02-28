@@ -4,6 +4,7 @@ from datetime import datetime
 import urllib.parse
 import pytz
 from fpdf import FPDF
+from streamlit_javascript import st_javascript
 
 # --- CONFIGURATION ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -11,7 +12,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: ხელუხლებელი დიზაინი + მობილურის ტექსტის მაქსიმალური ფიქსი
+# UI: Adaptive Styles
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -21,27 +22,25 @@ st.markdown("""
             linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px) !important;
         background-size: 30px 30px !important;
     }
-
-    /* ტექსტის სრული გამოჩენა მობილურზე */
-    .guide-text {
-        font-size: 0.9rem !important;
-        color: #1E3A8A !important;
-        line-height: 1.4 !important;
-        background: rgba(37, 99, 235, 0.05);
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
     
+    /* Press Enter Fix */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
     section[data-testid="stTextInput"] small {
         display: none !important;
     }
 
-    h1 { color: #1E3A8A !important; font-weight: 800 !important; margin-bottom: 0px !important; }
-    p, label { color: #000000 !important; font-weight: 700 !important; }
+    .guide-box {
+        font-size: 0.95rem !important;
+        color: #1E3A8A !important;
+        background: rgba(37, 99, 235, 0.07);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border-left: 5px solid #2563EB;
+    }
 
+    h1 { color: #1E3A8A !important; font-weight: 800 !important; }
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -49,29 +48,40 @@ st.markdown("""
         border-radius: 12px;
         font-weight: bold;
         height: 3.5em;
-        border: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIME ---
-tbilisi_tz = pytz.timezone('Asia/Tbilisi')
-timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
+# --- DEVICE DETECTION ---
+# ვიგებთ ეკრანის სიგანეს
+ui_width = st_javascript("window.innerWidth")
 
-# --- HEADER & GUIDE ---
+# --- HEADER ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-# პირდაპირი ტექსტი (Expander-ის გარეშე, რომ არაფერი ჩაიჭრას)
-st.markdown("""
-<div class="guide-text">
-<b>როგორ მუშაობს:</b> მონიშნე პროფილი და Assets, დაწერე მისია (მაგ: ბიზნეს პარტნიორი) და მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა თბილისში.
-</div>
-""", unsafe_allow_html=True)
+# --- ADAPTIVE GUIDE ---
+guide_content = """
+**როგორ მუშაობს:**
+1. **Profile:** მონიშნე შენი ენერგიის დონე.
+2. **Assets:** აირჩიე შენი ძლიერი მხარეები.
+3. **Mission:** დაწერე რა გინდა (მაგ: ბიზნეს პარტნიორის პოვნა).
+4. **Result:** მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა.
+"""
 
+if ui_width is not None and ui_width < 768:
+    # მობილურისთვის: პირდაპირი, გაშლილი ტექსტი
+    st.markdown(f'<div class="guide-box">{guide_content}</div>', unsafe_allow_html=True)
+else:
+    # ლეპტოპისთვის: ლამაზი ჩამოსაშლელი
+    with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
+        st.markdown(guide_content)
+
+tbilisi_tz = pytz.timezone('Asia/Tbilisi')
+timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
 st.caption(f"STATUS: ONLINE | TIME: {timestamp}")
 st.write("---")
 
-# --- INPUTS ---
+# --- INPUTS & LOGIC ---
 col1, col2 = st.columns(2)
 with col1:
     social_type = st.select_slider("Profile:", options=["Introvert", "Balanced", "Extrovert"])
@@ -107,9 +117,7 @@ if st.button("EXECUTE ALIGNMENT"):
             except Exception as e:
                 st.error(f"Grid Error: {e}")
 
-# --- FOOTER ---
 st.write("---")
 with st.expander("⚖️ LEGAL & PRIVACY"):
     st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
-st.markdown(f"**Architect:** Ilia Mgeladze")
-st.markdown(f"**Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
+st.markdown(f"**Architect:** Ilia Mgeladze | **Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
