@@ -9,7 +9,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: Light High-Contrast (ყველაფერი მკაფიოდ იკითხება)
+# UI: Light High-Contrast
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -48,12 +48,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR (აღდგენილი სრული სია) ---
+# --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### ⚙️ PARAMETERS")
     social_type = st.select_slider("Energy Profile:", options=["Introvert", "Balanced", "Extrovert"])
     
-    # სრული Assets სია, როგორც ადრე იყო
     asset_list = [
         "Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment", 
         "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR", 
@@ -71,7 +70,8 @@ with st.sidebar:
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 st.write(f"STATUS: ONLINE | {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
-mission = st.text_input("DEFINE MISSION:", placeholder="მაგ: მინდა ვიპოვო პარტნიორი სტარტაპისთვის...")
+# აი აქ შეიცვალა Placeholder ინგლისურად
+mission = st.text_input("DEFINE MISSION:", placeholder="e.g. Find a business partner in Real Estate...")
 
 if st.button("EXECUTE STRATEGIC ALIGNMENT"):
     if mission:
@@ -79,7 +79,6 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
             context = f"User: {social_type}, Skills: {skills}."
             is_georgian = any(char in mission for char in "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ")
             
-            # სტრატეგიული პრომპტი (დაბრუნებული მკაცრი სტრუქტურა)
             if is_georgian:
                 prompt = (
                     f"კონტექსტი: {context}. მისია: {mission}. "
@@ -101,7 +100,7 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
             data = {
                 "model": "llama-3.3-70b-versatile",
                 "messages": [
-                    {"role": "system", "content": "You are a senior social strategist. Be specific for Tbilisi locations."},
+                    {"role": "system", "content": "You are a senior social strategist. Match user language."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.3
@@ -127,14 +126,14 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                     st.download_button("💾 DOWNLOAD DOSSIER", result, file_name="nexus_mission.txt")
                     
             except Exception:
-                st.error("System connection error.")
+                st.error("System error.")
     else:
         st.warning("MISSION INPUT REQUIRED.")
 
-# --- FOOTER (შენი სახელი და მეილი) ---
+# --- FOOTER ---
 st.write("---")
 f1, f2 = st.columns([2, 1])
 with f1:
     st.markdown(f"**Architect:** Ilia Mgeladze<br>**Inquiries:** <a href='mailto:mgeladzeilia39@gmail.com'>mgeladzeilia39@gmail.com</a>", unsafe_allow_html=True)
 with f2:
-    st.markdown("<div style='text-align: right; color: #64748B;'>V3.2 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: right; color: #64748B;'>V3.3 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
