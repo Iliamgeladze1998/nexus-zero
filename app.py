@@ -11,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: სუფთა დიზაინი
+# UI: Adaptive Design with Guaranteed Visibility
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,11 +22,23 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
     
-    /* Press Enter Fix */
-    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
-    .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
-    section[data-testid="stTextInput"] small {
-        display: none !important;
+    /* მობილურზე ვაჩვენებთ ტექსტს პირდაპირ, ლეპტოპზე ვმალავთ */
+    @media (max-width: 768px) {
+        .mobile-only { display: block !important; }
+        .desktop-only { display: none !important; }
+    }
+    /* ლეპტოპზე პირიქით */
+    @media (min-width: 769px) {
+        .mobile-only { display: none !important; }
+        .desktop-only { display: block !important; }
+    }
+
+    .guide-box {
+        background: rgba(37, 99, 235, 0.05);
+        border-left: 5px solid #2563EB;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
     }
 
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
@@ -43,15 +55,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER & GUIDE ---
+# --- HEADER & ADAPTIVE GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
+guide_content = """
+1. **Profile:** მიუთითე შენი სოციალური ენერგიის დონე.
+2. **Assets:** მონიშნე შენი ძლიერი მხარეები და უნარები.
+3. **Mission:** ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).
+4. **Execute:** მიიღე სტრატეგიული გეგმა, ლოკაცია და დრო.
+"""
+
+# მობილური ვერსია (პირდაპირ ჩანს)
+st.markdown(f'<div class="mobile-only"><div class="guide-box"><b>📖 ინსტრუქცია:</b><br>{guide_content}</div></div>', unsafe_allow_html=True)
+
+# ლეპტოპის ვერსია (ჩამოსაშლელი)
+st.markdown('<div class="desktop-only">', unsafe_allow_html=True)
 with st.expander("📖 HOW IT WORKS / ინსტრუქცია"):
-    # ვიყენებთ st.caption-ს, რადგან ეს მობილურზე 100% ჩანს
-    st.caption("1. Profile: მიუთითე შენი სოციალური ენერგიის დონე.")
-    st.caption("2. Assets: მონიშნე შენი ძლიერი მხარეები და უნარები.")
-    st.caption("3. Mission: ჩაწერე კონკრეტული მიზანი (მაგ: პარტნიორის პოვნა).")
-    st.caption("4. Execute: მიიღე სტრატეგიული გეგმა, ლოკაცია და დრო.")
+    st.markdown(guide_content)
+st.markdown('</div>', unsafe_allow_html=True)
 
 tbilisi_tz = pytz.timezone('Asia/Tbilisi')
 timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
