@@ -4,6 +4,7 @@ from datetime import datetime
 import urllib.parse
 import pytz
 from fpdf import FPDF
+import io
 
 # --- CONFIGURATION ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -11,7 +12,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: აბსოლუტურად ხელუხლებელი დიზაინი
+# UI: აბსოლუტურად ხელუხლებელი დიზაინი + საბოლოო "Press Enter" ფიქსი
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -21,14 +22,27 @@ st.markdown("""
             linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px) !important;
         background-size: 30px 30px !important;
     }
-    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p { display: none !important; }
-    .st-emotion-cache-1pxm8yv { display: none !important; }
+
+    /* სამუდამოდ აქრობს "Press Enter to apply" ყველა ვარიაციას მობილურზე */
+    div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
+    .st-emotion-cache-1pxm8yv, 
+    .st-emotion-cache-1p78y8e, 
+    .st-emotion-cache-6q9sum,
+    section[data-testid="stTextInput"] small {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        position: absolute !important;
+    }
+
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
     p, label { color: #000000 !important; font-weight: 700 !important; }
+
     @media (max-width: 768px) {
         .main .block-container { padding: 1rem !important; }
         h1 { font-size: 1.6rem !important; }
     }
+
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -63,7 +77,6 @@ mission = st.text_input("MISSION:", placeholder="e.g. I want to find a business 
 if st.button("EXECUTE ALIGNMENT"):
     if mission:
         with st.spinner("SCANNING GRID..."):
-            # AI-ს ვავალებთ კონკრეტულ მოქმედებებს და ზუსტ ფორმატს ლოკაციისთვის
             prompt = f"""
             Mission: {mission}. Profile: {social_type}. Assets: {skills}. 
             Provide a tactical plan for Tbilisi: 
@@ -73,28 +86,19 @@ if st.button("EXECUTE ALIGNMENT"):
             At the end, write ONLY the place name like this: 'FINAL_DESTINATION: Venue Name'
             """
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-            data = {
-                "model": "llama-3.3-70b-versatile",
-                "messages": [
-                    {"role": "system", "content": "You are a tactical social engineer. Give 1 specific location and a step-by-step action plan. Be very precise."},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": 0.4
-            }
+            data = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": "You are a tactical social engineer. Be precise."}, {"role": "user", "content": prompt}], "temperature": 0.4}
             
             try:
                 response = requests.post(GROQ_URL, headers=headers, json=data)
                 result = response.json()["choices"][0]["message"]["content"]
                 st.info(result)
                 
-                # Precision Maps Logic
                 if "FINAL_DESTINATION:" in result:
                     loc_name = result.split("FINAL_DESTINATION:")[1].strip()
-                    # ძებნა კონკრეტული სახელით თბილისში
                     maps_url = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_name + ' Tbilisi')}"
                     st.link_button(f"📍 NAVIGATE TO {loc_name.upper()}", maps_url)
 
-                # PDF Dossier (Binary Fix)
+                # PDF Fix (Binary bytes)
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
@@ -108,6 +112,5 @@ if st.button("EXECUTE ALIGNMENT"):
 st.write("---")
 with st.expander("⚖️ LEGAL & PRIVACY"):
     st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
-
 st.markdown(f"**Architect:** Ilia Mgeladze")
 st.markdown(f"**Inquiries:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
