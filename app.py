@@ -9,156 +9,103 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI UPGRADE: Soft Dark & High Contrast
+# UI UPGRADE: Slate Theme (No more pure black)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
     
-    /* ფონი - აღარ არის "კუპრივით" შავი */
+    /* მთავარი ფონი - Slate Gray */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'JetBrains Mono', monospace;
-        background-color: #0A0A0B; 
-        color: #E0E0E0;
+        background-color: #1E1E2E !important; 
+        color: #CDD6F4;
     }
 
-    /* Sidebar - ოდნავ უფრო ღია ნაცრისფერი */
+    /* Sidebar - ოდნავ მუქი */
     [data-testid="stSidebar"] {
-        background-color: #111112 !important;
-        border-right: 1px solid #2D2D2E;
+        background-color: #181825 !important;
+        border-right: 2px solid #313244;
     }
 
-    /* Input ველები - მკაფიო კონტურებით */
+    /* სათაური */
+    h1 { color: #89B4FA !important; }
+
+    /* Input ველები - თეთრი ფონით უკეთესი კონტრასტისთვის */
     .stTextInput>div>div>input {
-        background-color: #1A1A1B !important;
-        color: #00FFCC !important;
-        border: 1px solid #3D3D3E !important;
-        border-radius: 8px;
-        font-size: 1.05em;
-    }
-    
-    /* ტექსტის ფერი Sidebar-ში */
-    [data-testid="stWidgetLabel"] {
-        color: #FFFFFF !important;
-        font-weight: bold !important;
+        background-color: #313244 !important;
+        color: #F5E0DC !important;
+        border: 2px solid #45475A !important;
+        border-radius: 10px;
     }
 
-    /* ღილაკი - მკვეთრი და ეფექტური */
+    /* ღილაკი */
     .stButton>button {
-        border: 1px solid #FF00FF !important;
-        background-color: rgba(255, 0, 255, 0.05) !important;
-        color: #FF00FF !important;
+        border: none !important;
+        background-color: #F5C2E7 !important;
+        color: #11111B !important;
         font-weight: bold;
-        border-radius: 8px;
+        border-radius: 10px;
         height: 3.5em;
-        transition: 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #FF00FF !important;
-        color: #000000 !important;
-        box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+        background-color: #CBA6F7 !important;
+        box-shadow: 0 0 15px #CBA6F7;
     }
 
-    /* Intel Box - მაქსიმალური კითხვადობა თეთრი ტექსტით */
+    /* პასუხის ბლოკი - ძალიან მკაფიო */
     .stInfo {
-        border: 1px solid #00FFCC !important;
-        background-color: #121517 !important;
+        border: 2px solid #A6E3A1 !important;
+        background-color: #313244 !important;
         color: #FFFFFF !important;
         font-size: 1.1em;
-        line-height: 1.6;
-        border-radius: 12px;
+        border-radius: 15px;
         padding: 25px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
-
-    /* Footer-ის სტილი */
-    .footer-section {
-        color: #888888;
-        font-size: 0.9em;
-        margin-top: 50px;
-    }
-    a { color: #00FFCC !important; text-decoration: none; }
 </style>
 """, unsafe_allow_html=True)
 
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### ⚙️ PARAMETERS")
-    social_type = st.select_slider("Energy Profile:", options=["Introvert", "Balanced", "Extrovert"])
-    asset_list = ["Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment", "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR", "Capital", "Charisma"]
-    skills = st.multiselect("Available Assets:", asset_list)
+    social_type = st.select_slider("Energy:", options=["Introvert", "Balanced", "Extrovert"])
+    skills = st.multiselect("Assets:", ["Tech", "Business", "Art", "Finance", "Marketing"])
     st.write("---")
-    with st.expander("⚖️ LEGAL & PRIVACY"):
-        st.caption("Nexus Zero Protocol. Developed by Ilia Mgeladze.")
+    with st.expander("⚖️ LEGAL"):
+        st.caption("Developed by Ilia Mgeladze.")
     if st.button("RESET"):
         st.rerun()
 
 # --- MAIN INTERFACE ---
 st.title("⚡ NEXUS ZERO: TBILISI GRID")
-st.markdown(f"<p style='color:#888;'>STATUS: <span style='color:#00FFCC;'>ONLINE</span> | {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>", unsafe_allow_html=True)
+st.write(f"SYSTEM STATUS: ONLINE | {datetime.now().strftime('%H:%M')}")
 
-mission = st.text_input("DEFINE MISSION:", placeholder="Enter objective (e.g. Find startup partners)...")
+mission = st.text_input("DEFINE MISSION:", placeholder="მაგ: მინდა ვიპოვო პარტნიორი...")
 
-if st.button("EXECUTE STRATEGIC ALIGNMENT"):
+if st.button("EXECUTE"):
     if mission:
-        with st.spinner("PROCESSING VECTORS..."):
+        with st.spinner("PROCESSING..."):
             context = f"User: {social_type}, Skills: {skills}."
             is_georgian = any(char in mission for char in "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ")
             
-            if is_georgian:
-                prompt = (
-                    f"კონტექსტი: {context}. მისია: {mission}. "
-                    "მოამზადე მკაცრი სოციალური ბლუპრინტი თბილისისთვის. "
-                    "სტრუქტურა: 1. ვენიუს სახელი, 2. ზუსტი წერტილი, 3. სამიზნე პერსონა, "
-                    "4. Icebreaker, 5. სტრატეგიული გეგმა, 6. ალბათობის ლოგიკა. "
-                    "ტონი: ტაქტიკური. დაიწყე პირდაპირ 'ვენიუს სახელი:'-ით."
-                )
-            else:
-                prompt = (
-                    f"User context: {context}. Mission: {mission}. "
-                    "Provide an elite Social Blueprint for Tbilisi. "
-                    "Structure: 1. Venue Name, 2. Exact Spot, 3. Persona Identification, "
-                    "4. Professional Icebreaker, 5. Strategic Action Plan, 6. Logic of Probability. "
-                    "Tone: Tactical. Start with 'Venue Name:'."
-                )
+            prompt = (f"Context: {context}. Mission: {mission}. Provide tactical advice for Tbilisi. "
+                      f"Respond in {'Georgian' if is_georgian else 'English'}.")
             
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
             data = {
                 "model": "llama-3.3-70b-versatile",
-                "messages": [
-                    {"role": "system", "content": "You are a senior social strategist. Provide specific, actionable advice. Match the user's language."},
-                    {"role": "user", "content": prompt}
-                ],
+                "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.3
             }
             
             try:
                 response = requests.post(GROQ_URL, headers=headers, json=data)
                 result = response.json()["choices"][0]["message"]["content"]
-                
-                try:
-                    venue_line = [l for l in result.split('\n') if ':' in l][0]
-                    venue_name = venue_line.split(':')[1].strip()
-                except:
-                    venue_name = "Tbilisi"
-                
-                st.markdown("### 🎯 STRATEGIC INTEL")
                 st.info(result)
-                
-                m1, m2 = st.columns(2)
-                with m1:
-                    st.link_button("📍 GOOGLE MAPS", f"https://www.google.com/maps/search/{urllib.parse.quote(venue_name + ' Tbilisi')}")
-                with m2:
-                    st.download_button("💾 DOWNLOAD", result, file_name="nexus_mission.txt")
-                    
-            except Exception:
-                st.error("Connection Failed.")
+            except:
+                st.error("Error.")
     else:
-        st.warning("MISSION INPUT REQUIRED.")
+        st.warning("Input required.")
 
 # --- FOOTER ---
 st.write("---")
-f1, f2 = st.columns([2, 1])
-with f1:
-    st.markdown(f"<div class='footer-section'><b>Architect:</b> Ilia Mgeladze<br><b>Inquiries:</b> <a href='mailto:mgeladzeilia39@gmail.com'>mgeladzeilia39@gmail.com</a></div>", unsafe_allow_html=True)
-with f2:
-    st.markdown("<div style='text-align: right; color: #555; margin-top: 10px;'>V2.9 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
+st.markdown(f"**Architect:** Ilia Mgeladze | **Contact:** [mgeladzeilia39@gmail.com](mailto:mgeladzeilia39@gmail.com)")
