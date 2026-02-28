@@ -12,7 +12,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: დიზაინი ხელუხლებელია + Press Enter-ის საბოლოო ბლოკირება
+# UI: ხელუხლებელი დიზაინი + მობილურის ტექსტის ფიქსი
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -22,15 +22,24 @@ st.markdown("""
             linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px) !important;
         background-size: 30px 30px !important;
     }
+
+    /* მობილურზე ტექსტის სრული გამოჩენის ფიქსი */
+    [data-testid="stExpander"] div[role="button"] p {
+        overflow: visible !important;
+        white-space: normal !important;
+    }
+    
+    /* Press Enter-ის საბოლოო ბლოკირება */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
     section[data-testid="stTextInput"] small {
         display: none !important;
         visibility: hidden !important;
-        height: 0 !important;
     }
+
     h1 { color: #1E3A8A !important; font-weight: 800 !important; }
     p, label { color: #000000 !important; font-weight: 700 !important; }
+
     .stButton>button {
         width: 100% !important;
         background-color: #2563EB !important;
@@ -47,10 +56,10 @@ st.markdown("""
 tbilisi_tz = pytz.timezone('Asia/Tbilisi')
 timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
 
-# --- HEADER & GUIDE (ახალი ბლოკი) ---
+# --- HEADER & GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-# მოკლე აღწერა, რომელიც მომხმარებელს გზას უჩვენებს
+# ინსტრუქცია, რომელიც ახლა მობილურზეც სრულად გამოჩნდება
 with st.expander("📖 HOW IT WORKS / რისთვისაა ეს?"):
     st.markdown("""
     **Nexus Zero** არის თბილისზე მორგებული სოციალური სტრატეგი.
@@ -63,7 +72,7 @@ with st.expander("📖 HOW IT WORKS / რისთვისაა ეს?"):
 st.caption(f"STATUS: ONLINE | TIME: {timestamp}")
 st.write("---")
 
-# --- INPUTS (იდენტურია, როგორც სქრინებზე გქონდა) ---
+# --- INPUTS ---
 col1, col2 = st.columns(2)
 with col1:
     social_type = st.select_slider("Profile:", options=["Introvert", "Balanced", "Extrovert"])
