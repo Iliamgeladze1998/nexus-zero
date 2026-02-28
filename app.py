@@ -4,7 +4,6 @@ from datetime import datetime
 import urllib.parse
 import pytz
 from fpdf import FPDF
-import io
 
 # --- CONFIGURATION ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -12,7 +11,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# UI: ხელუხლებელი დიზაინი + მობილურის ტექსტის ფიქსი
+# UI: ხელუხლებელი დიზაინი + მობილურის ტექსტის მაქსიმალური ფიქსი
 st.markdown("""
 <style>
     [data-testid="stAppViewContainer"] {
@@ -23,21 +22,24 @@ st.markdown("""
         background-size: 30px 30px !important;
     }
 
-    /* მობილურზე ტექსტის სრული გამოჩენის ფიქსი */
-    [data-testid="stExpander"] div[role="button"] p {
-        overflow: visible !important;
-        white-space: normal !important;
+    /* ტექსტის სრული გამოჩენა მობილურზე */
+    .guide-text {
+        font-size: 0.9rem !important;
+        color: #1E3A8A !important;
+        line-height: 1.4 !important;
+        background: rgba(37, 99, 235, 0.05);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
     }
     
-    /* Press Enter-ის საბოლოო ბლოკირება */
     div[data-testid="stTextInput"] div[data-testid="stMarkdownContainer"] p,
     .st-emotion-cache-1pxm8yv, .st-emotion-cache-1p78y8e, .st-emotion-cache-6q9sum,
     section[data-testid="stTextInput"] small {
         display: none !important;
-        visibility: hidden !important;
     }
 
-    h1 { color: #1E3A8A !important; font-weight: 800 !important; }
+    h1 { color: #1E3A8A !important; font-weight: 800 !important; margin-bottom: 0px !important; }
     p, label { color: #000000 !important; font-weight: 700 !important; }
 
     .stButton>button {
@@ -59,15 +61,12 @@ timestamp = datetime.now(tbilisi_tz).strftime('%H:%M')
 # --- HEADER & GUIDE ---
 st.title("🎯 NEXUS ZERO: TBILISI GRID")
 
-# ინსტრუქცია, რომელიც ახლა მობილურზეც სრულად გამოჩნდება
-with st.expander("📖 HOW IT WORKS / რისთვისაა ეს?"):
-    st.markdown("""
-    **Nexus Zero** არის თბილისზე მორგებული სოციალური სტრატეგი.
-    1. **Profile:** მონიშნე შენი ენერგიის დონე.
-    2. **Assets:** აირჩიე შენი ძლიერი მხარეები.
-    3. **Mission:** დაწერე რა გინდა (მაგ: ბიზნეს პარტნიორის პოვნა).
-    4. **Result:** მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა.
-    """)
+# პირდაპირი ტექსტი (Expander-ის გარეშე, რომ არაფერი ჩაიჭრას)
+st.markdown("""
+<div class="guide-text">
+<b>როგორ მუშაობს:</b> მონიშნე პროფილი და Assets, დაწერე მისია (მაგ: ბიზნეს პარტნიორი) და მიიღე ზუსტი ლოკაცია, დრო და სამოქმედო გეგმა თბილისში.
+</div>
+""", unsafe_allow_html=True)
 
 st.caption(f"STATUS: ONLINE | TIME: {timestamp}")
 st.write("---")
