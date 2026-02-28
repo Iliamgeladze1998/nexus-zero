@@ -4,6 +4,7 @@ from datetime import datetime
 import urllib.parse
 
 # --- CONFIGURATION ---
+# იყენებს Streamlit-ის Secrets-ს უსაფრთხოებისთვის
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -13,6 +14,7 @@ st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+    
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'JetBrains Mono', monospace;
         background-color: #050505;
@@ -49,9 +51,20 @@ st.markdown("""
 with st.sidebar:
     st.markdown("### ⚙️ STRATEGIC PARAMETERS")
     social_type = st.select_slider("Energy Profile:", options=["Introvert", "Balanced", "Extrovert"])
-    asset_list = ["Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment", "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR", "Capital", "Charisma"]
+    
+    # აქტივების სია
+    asset_list = [
+        "Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment",
+        "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR",
+        "Capital", "Charisma", "Education/Academic"
+    ]
     skills = st.multiselect("Available Assets:", asset_list)
+    
     st.write("---")
+    # დააბრუნა Privacy და Legal სექცია
+    with st.expander("⚖️ LEGAL & PRIVACY"):
+        st.caption("Nexus Zero Protocol. Encrypted session. Developed by Ilia Mgeladze.")
+    
     if st.button("RESET SESSION"):
         st.rerun()
 
@@ -66,7 +79,7 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
         with st.spinner("ANALYZING SOCIAL VECTORS..."):
             context = f"User: {social_type}, Skills: {skills}."
             
-            # ენის დეტექტორი
+            # ენის ჭკვიანი დეტექტორი
             is_georgian = any(char in mission for char in "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ")
             
             if is_georgian:
@@ -95,10 +108,10 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
             data = {
                 "model": "llama-3.3-70b-versatile",
                 "messages": [
-                    {"role": "system", "content": "You are a senior social strategist. You provide high-level, tactical advice for Tbilisi. Be specific, never generic."},
+                    {"role": "system", "content": "You are a senior social strategist. Respond strictly in the language used by the user. Be tactical and specific."},
                     {"role": "user", "content": prompt}
                 ],
-                "temperature": 0.3
+                "temperature": 0.3 # სიზუსტისთვის
             }
             
             try:
@@ -106,8 +119,9 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                 result = response.json()["choices"][0]["message"]["content"]
                 
                 try:
-                    # ლოკაციის ამოღება Google Maps-ისთვის
-                    venue_name = result.split('\n')[0].split(':')[1].strip()
+                    # ლოკაციის ამოღება რუკისთვის
+                    venue_line = [l for l in result.split('\n') if ':' in l][0]
+                    venue_name = venue_line.split(':')[1].strip()
                 except:
                     venue_name = "Tbilisi"
                 
@@ -121,9 +135,15 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                     st.download_button("💾 DOWNLOAD DOSSIER", result, file_name="nexus_mission.txt")
                     
             except Exception:
-                st.error("System Override Failed. Check connection.")
+                st.error("Connection Interrupted.")
     else:
         st.warning("MISSION INPUT REQUIRED.")
 
+# --- FOOTER (შენი სახელით და მეილით) ---
 st.write("---")
-st.markdown("<div style='text-align: right; color: #555;'>V2.5 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
+f1, f2 = st.columns([2, 1])
+with f1:
+    st.markdown("**Architect:** Ilia Mgeladze")
+    st.markdown(f"**Inquiries:** [Mgeladzeilia39@gmail.com](mailto:Mgeladzeilia39@gmail.com)")
+with f2:
+    st.markdown("<div style='text-align: right; color: #555;'>V2.6 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
