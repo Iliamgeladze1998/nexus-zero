@@ -4,45 +4,74 @@ from datetime import datetime
 import urllib.parse
 
 # --- CONFIGURATION ---
-# იყენებს Streamlit-ის Secrets-ს უსაფრთხოებისთვის
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 st.set_page_config(page_title="NEXUS ZERO PRO", page_icon="🎯", layout="wide")
 
-# Custom CSS for Professional Minimalist Neon UI
+# UI UPGRADE: Better Contrast & Readability
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
     
+    /* Background & Main Container */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'JetBrains Mono', monospace;
-        background-color: #050505;
+        background-color: #0e1117; /* Deep Charcoal instead of Pure Black */
+        color: #e0e0e0;
     }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #161b22 !important;
+        border-right: 1px solid #30363d;
+    }
+
+    /* Input Field Styling */
+    .stTextInput>div>div>input {
+        background-color: #1c2128 !important;
+        color: #00ffcc !important;
+        border: 1px solid #30363d !important;
+        border-radius: 8px;
+    }
+
+    /* Execute Button */
     .stButton>button {
         border: 1px solid #ff00ff !important;
-        background-color: transparent !important;
+        background-color: rgba(255, 0, 255, 0.05) !important;
         color: #ff00ff !important;
         font-weight: bold;
-        transition: 0.3s;
-        width: 100%;
-        height: 3.5em;
+        border-radius: 8px;
+        transition: 0.4s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .stButton>button:hover {
         background-color: #ff00ff !important;
         color: white !important;
-        box-shadow: 0 0 20px #ff00ff;
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
     }
+
+    /* Strategic Intel Box (Glassmorphism) */
     .stInfo {
         border: 1px solid #00ffcc !important;
-        background-color: #0a0a0a !important;
-        color: #e0e0e0 !important;
-        font-size: 1.05em;
+        background-color: rgba(0, 255, 204, 0.05) !important;
+        color: #ffffff !important;
+        font-size: 1.1em;
+        line-height: 1.6;
+        border-radius: 12px;
+        padding: 25px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
-    .stTextInput>div>div>input {
-        background-color: #111 !important;
-        color: #00ffcc !important;
-        border: 1px solid #333 !important;
+
+    /* Professional Footer */
+    .footer-text {
+        color: #8b949e;
+        font-size: 0.9em;
+    }
+    a {
+        color: #58a6ff !important;
+        text-decoration: none;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -51,26 +80,17 @@ st.markdown("""
 with st.sidebar:
     st.markdown("### ⚙️ STRATEGIC PARAMETERS")
     social_type = st.select_slider("Energy Profile:", options=["Introvert", "Balanced", "Extrovert"])
-    
-    # აქტივების სია
-    asset_list = [
-        "Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment",
-        "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR",
-        "Capital", "Charisma", "Education/Academic"
-    ]
+    asset_list = ["Tech/Dev", "Crypto/Web3", "Business/Sales", "Finance/Investment", "Creative/Design", "Art/Culture", "Real Estate", "Marketing/PR", "Capital", "Charisma"]
     skills = st.multiselect("Available Assets:", asset_list)
-    
     st.write("---")
-    # დააბრუნა Privacy და Legal სექცია
     with st.expander("⚖️ LEGAL & PRIVACY"):
         st.caption("Nexus Zero Protocol. Encrypted session. Developed by Ilia Mgeladze.")
-    
     if st.button("RESET SESSION"):
         st.rerun()
 
 # --- MAIN INTERFACE ---
 st.title("⚡ NEXUS ZERO: TBILISI GRID")
-st.write(f"STATUS: ONLINE | {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+st.markdown(f"<p style='color:#8b949e;'>STATUS: <span style='color:#00ffcc;'>ONLINE</span> | {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>", unsafe_allow_html=True)
 
 mission = st.text_input("DEFINE MISSION:", placeholder="მაგ: მინდა ვიპოვო პარტნიორი სტარტაპისთვის...")
 
@@ -78,8 +98,6 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
     if mission:
         with st.spinner("ANALYZING SOCIAL VECTORS..."):
             context = f"User: {social_type}, Skills: {skills}."
-            
-            # ენის ჭკვიანი დეტექტორი
             is_georgian = any(char in mission for char in "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ")
             
             if is_georgian:
@@ -108,10 +126,10 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
             data = {
                 "model": "llama-3.3-70b-versatile",
                 "messages": [
-                    {"role": "system", "content": "You are a senior social strategist. Respond strictly in the language used by the user. Be tactical and specific."},
+                    {"role": "system", "content": "You are a senior social strategist. Respond strictly in the language used by the user."},
                     {"role": "user", "content": prompt}
                 ],
-                "temperature": 0.3 # სიზუსტისთვის
+                "temperature": 0.3
             }
             
             try:
@@ -119,7 +137,6 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
                 result = response.json()["choices"][0]["message"]["content"]
                 
                 try:
-                    # ლოკაციის ამოღება რუკისთვის
                     venue_line = [l for l in result.split('\n') if ':' in l][0]
                     venue_name = venue_line.split(':')[1].strip()
                 except:
@@ -139,11 +156,10 @@ if st.button("EXECUTE STRATEGIC ALIGNMENT"):
     else:
         st.warning("MISSION INPUT REQUIRED.")
 
-# --- FOOTER (შენი სახელით და მეილით) ---
+# --- FOOTER ---
 st.write("---")
 f1, f2 = st.columns([2, 1])
 with f1:
-    st.markdown("**Architect:** Ilia Mgeladze")
-    st.markdown(f"**Inquiries:** [Mgeladzeilia39@gmail.com](mailto:Mgeladzeilia39@gmail.com)")
+    st.markdown(f"<div class='footer-text'><b>Architect:</b> Ilia Mgeladze<br><b>Inquiries:</b> <a href='mailto:mgeladzeilia39@gmail.com'>mgeladzeilia39@gmail.com</a></div>", unsafe_allow_html=True)
 with f2:
-    st.markdown("<div style='text-align: right; color: #555;'>V2.6 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: right; color: #555;'>V2.7 | SYSTEM OPERATIONAL</div>", unsafe_allow_html=True)
